@@ -178,9 +178,7 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
     AnimationListenerAdapter mSlideInListener = new AnimationListenerAdapter() {
         @Override
         public void onAnimationEnd(Animation animation) {
-            if (!isInSearchUi()) {
-                enterSearchUi(true /* isSmartDial */, mSearchQuery, false);
-            }
+            maybeEnterSearchUi();
         }
     };
 
@@ -762,7 +760,11 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
             });
         } else {
             mFloatingActionButtonController.setVisible(false);
+<<<<<<< HEAD
             onFloatingActionButtonHidden();
+=======
+            maybeEnterSearchUi();
+>>>>>>> 81a313d... Enter search UI even if dialpad is not animating
         }
         mActionBarController.onDialpadUp();
 
@@ -1103,6 +1105,12 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
             DialerUtils.hideInputMethod(mParentLayout);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void maybeEnterSearchUi() {
+        if (!isInSearchUi()) {
+            enterSearchUi(true /* isSmartDial */, mSearchQuery, false);
         }
     }
 
