@@ -44,6 +44,7 @@ public class SearchFragment extends PhoneNumberPickerFragment {
     private static final String TAG = "SearchFragment";
 
     private OnListFragmentScrolledListener mActivityScrollListener;
+    private View.OnTouchListener mActivityOnTouchListener;
 
     /*
      * Stores the untouched user-entered string that is used to populate the add to contacts
@@ -117,6 +118,9 @@ public class SearchFragment extends PhoneNumberPickerFragment {
                     int totalItemCount) {
             }
         });
+        if (mActivityOnTouchListener != null) {
+            listView.setOnTouchListener(mActivityOnTouchListener);
+        }
 
         updatePosition(false /* animate */);
     }
@@ -264,4 +268,21 @@ public class SearchFragment extends PhoneNumberPickerFragment {
                 listView.getPaddingEnd(),
                 listView.getPaddingBottom());
     }
+<<<<<<< HEAD
+=======
+
+    @Override
+    protected void startLoading() {
+        if (PermissionsUtil.hasContactsPermissions(getActivity())) {
+            super.startLoading();
+        } else if (TextUtils.isEmpty(getQueryString())) {
+            // Clear out any existing call shortcuts.
+            getAdapter().setQueryString(null);
+        }
+    }
+
+    public void setOnTouchListener(View.OnTouchListener onTouchListener) {
+        mActivityOnTouchListener = onTouchListener;
+    }
+>>>>>>> 6324f70... Fix FAB state and transitions.
 }

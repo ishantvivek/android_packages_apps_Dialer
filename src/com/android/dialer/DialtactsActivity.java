@@ -91,7 +91,7 @@ import com.android.dialer.settings.DialerSettingsActivity;
 import com.android.dialer.util.DialerUtils;
 import com.android.dialer.widget.ActionBarController;
 import com.android.dialer.widget.SearchEditTextLayout;
-import com.android.dialer.widget.SearchEditTextLayout.OnBackButtonClickedListener;
+import com.android.dialer.widget.SearchEditTextLayout.Callback;
 import com.android.dialerbind.DatabaseHelperManager;
 import com.android.phone.common.animation.AnimUtils;
 import com.android.phone.common.util.SettingsUtil;
@@ -147,6 +147,8 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
     private static final String ACTION_TOUCH_DIALER = "com.android.phone.action.TOUCH_DIALER";
 
     private static final int ACTIVITY_REQUEST_CODE_VOICE_SEARCH = 1;
+
+    private static final int FAB_SCALE_IN_DELAY_MS = 300;
 
     private FrameLayout mParentLayout;
 
@@ -347,14 +349,19 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
     };
 
     /**
-     * If the search term is empty and the user closes the soft keyboard, close the search UI.
+     * Handles the user closing the soft keyboard.
      */
     private final View.OnKeyListener mSearchEditTextLayoutListener = new View.OnKeyListener() {
         @Override
         public boolean onKey(View v, int keyCode, KeyEvent event) {
-            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN &&
-                    TextUtils.isEmpty(mSearchView.getText().toString())) {
-                maybeExitSearchUi();
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (TextUtils.isEmpty(mSearchView.getText().toString())) {
+                    // If the search term is empty, close the search UI.
+                    maybeExitSearchUi();
+                } else {
+                    // If the search term is not empty, show the dialpad fab.
+                    showFabInSearchUi();
+                }
             }
             return false;
         }
@@ -399,10 +406,16 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
                 .setOnClickListener(mSearchViewOnClickListener);
         searchEditTextLayout.findViewById(R.id.search_box_start_search)
                 .setOnClickListener(mSearchViewOnClickListener);
-        searchEditTextLayout.setOnBackButtonClickedListener(new OnBackButtonClickedListener() {
+        searchEditTextLayout.setCallback(new SearchEditTextLayout.Callback() {
             @Override
             public void onBackButtonClicked() {
                 onBackPressed();
+            }
+
+            @Override
+            public void onSearchViewClicked() {
+                // Hide FAB, as the keyboard is shown.
+                mFloatingActionButtonController.scaleOut();
             }
         });
 
@@ -470,7 +483,8 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
                         observer.removeOnGlobalLayoutListener(this);
                         int screenWidth = mParentLayout.getWidth();
                         mFloatingActionButtonController.setScreenWidth(screenWidth);
-                        updateFloatingActionButtonControllerAlignment(false /* animate */);
+                        mFloatingActionButtonController.align(
+                                getFabAlignment(), false /* animate */);
                     }
                 });
 
@@ -551,7 +565,13 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
             mIsRestarting = false;
         }
         prepareVoiceSearchButton();
+<<<<<<< HEAD
         updateFloatingActionButtonControllerAlignment(false /* animate */);
+=======
+        mDialerDatabaseHelper.startSmartDialUpdateThread();
+        mFloatingActionButtonController.align(getFabAlignment(), false /* animate */);
+        Trace.endSection();
+>>>>>>> 6324f70... Fix FAB state and transitions.
     }
 
     @Override
@@ -814,7 +834,7 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
 
         updateSearchFragmentPosition();
 
-        updateFloatingActionButtonControllerAlignment(animate);
+        mFloatingActionButtonController.align(getFabAlignment(), animate);
         if (animate) {
             mDialpadFragment.getView().startAnimation(mSlideOut);
         } else {
@@ -1021,6 +1041,8 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
         mInDialpadSearch = smartDialSearch;
         mInRegularSearch = !smartDialSearch;
 
+        mFloatingActionButtonController.scaleOut();
+
         SearchFragment fragment = (SearchFragment) getFragmentManager().findFragmentByTag(tag);
         if (animate) {
             transaction.setCustomAnimations(android.R.animator.fade_in, 0);
@@ -1032,6 +1054,15 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
                 fragment = new SmartDialSearchFragment();
             } else {
                 fragment = new RegularSearchFragment();
+                fragment.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        // Show the FAB when the user touches the lists fragment and the soft
+                        // keyboard is hidden.
+                        showFabInSearchUi();
+                        return false;
+                    }
+                });
             }
             transaction.add(R.id.dialtacts_frame, fragment, tag);
         } else {
@@ -1063,6 +1094,14 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
         mSearchView.setText(null);
         mDialpadFragment.clearDialpad();
         setNotInSearchUi();
+
+        // Restore the FAB for the lists fragment.
+        if (getFabAlignment() != FloatingActionButtonController.ALIGN_END) {
+            mFloatingActionButtonController.setVisible(false);
+        }
+        mFloatingActionButtonController.scaleIn(FAB_SCALE_IN_DELAY_MS);
+        onPageScrolled(mListsFragment.getCurrentTabIndex(), 0 /* offset */, 0 /* pixelOffset */);
+        onPageSelected(mListsFragment.getCurrentTabIndex());
 
         final FragmentTransaction transaction = getFragmentManager().beginTransaction();
         if (mSmartDialSearchFragment != null) {
@@ -1121,6 +1160,14 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
             return true;
         }
         return false;
+    }
+
+    private void showFabInSearchUi() {
+        mFloatingActionButtonController.changeIcon(
+                getResources().getDrawable(R.drawable.fab_ic_dial),
+                getResources().getString(R.string.action_menu_dialpad_button));
+        mFloatingActionButtonController.align(getFabAlignment(), false /* animate */);
+        mFloatingActionButtonController.scaleIn(FAB_SCALE_IN_DELAY_MS);
     }
 
     @Override
@@ -1350,6 +1397,7 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
         return mActionBarHeight;
     }
 
+<<<<<<< HEAD
     /**
      * Updates controller based on currently known information.
      *
@@ -1360,5 +1408,14 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
                 FloatingActionButtonController.ALIGN_MIDDLE :
                         FloatingActionButtonController.ALIGN_END;
         mFloatingActionButtonController.align(align, 0 /* offsetX */, 0 /* offsetY */, animate);
+=======
+
+    private int getFabAlignment() {
+        if (!mIsLandscape && !isInSearchUi() &&
+                mListsFragment.getCurrentTabIndex() == ListsFragment.TAB_INDEX_SPEED_DIAL) {
+            return FloatingActionButtonController.ALIGN_MIDDLE;
+        }
+        return FloatingActionButtonController.ALIGN_END;
+>>>>>>> 6324f70... Fix FAB state and transitions.
     }
 }
