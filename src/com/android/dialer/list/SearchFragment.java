@@ -268,8 +268,6 @@ public class SearchFragment extends PhoneNumberPickerFragment {
                 listView.getPaddingEnd(),
                 listView.getPaddingBottom());
     }
-<<<<<<< HEAD
-=======
 
     @Override
     protected void startLoading() {
@@ -284,5 +282,4 @@ public class SearchFragment extends PhoneNumberPickerFragment {
     public void setOnTouchListener(View.OnTouchListener onTouchListener) {
         mActivityOnTouchListener = onTouchListener;
     }
->>>>>>> 6324f70... Fix FAB state and transitions.
 }

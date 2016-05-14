@@ -565,13 +565,10 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
             mIsRestarting = false;
         }
         prepareVoiceSearchButton();
-<<<<<<< HEAD
         updateFloatingActionButtonControllerAlignment(false /* animate */);
-=======
         mDialerDatabaseHelper.startSmartDialUpdateThread();
         mFloatingActionButtonController.align(getFabAlignment(), false /* animate */);
         Trace.endSection();
->>>>>>> 6324f70... Fix FAB state and transitions.
     }
 
     @Override
@@ -1397,7 +1394,6 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
         return mActionBarHeight;
     }
 
-<<<<<<< HEAD
     /**
      * Updates controller based on currently known information.
      *
@@ -1408,7 +1404,6 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
                 FloatingActionButtonController.ALIGN_MIDDLE :
                         FloatingActionButtonController.ALIGN_END;
         mFloatingActionButtonController.align(align, 0 /* offsetX */, 0 /* offsetY */, animate);
-=======
 
     private int getFabAlignment() {
         if (!mIsLandscape && !isInSearchUi() &&
@@ -1416,6 +1411,5 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
             return FloatingActionButtonController.ALIGN_MIDDLE;
         }
         return FloatingActionButtonController.ALIGN_END;
->>>>>>> 6324f70... Fix FAB state and transitions.
     }
 }

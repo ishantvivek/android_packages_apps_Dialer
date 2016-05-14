@@ -130,8 +130,6 @@ public class SearchEditTextLayout extends FrameLayout {
             }
         });
 
-<<<<<<< HEAD
-=======
         mSearchView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -156,7 +154,6 @@ public class SearchEditTextLayout extends FrameLayout {
             }
         });
 
->>>>>>> 6324f70... Fix FAB state and transitions.
         findViewById(R.id.search_close_button).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
