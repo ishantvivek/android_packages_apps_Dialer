@@ -1399,12 +1399,6 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
      *
      * @param animate Whether or not to animate the transition.
      */
-    private void updateFloatingActionButtonControllerAlignment(boolean animate) {
-        int align = (!mIsLandscape && mCurrentTabPosition == ListsFragment.TAB_INDEX_SPEED_DIAL) ?
-                FloatingActionButtonController.ALIGN_MIDDLE :
-                        FloatingActionButtonController.ALIGN_END;
-        mFloatingActionButtonController.align(align, 0 /* offsetX */, 0 /* offsetY */, animate);
-
     private int getFabAlignment() {
         if (!mIsLandscape && !isInSearchUi() &&
                 mListsFragment.getCurrentTabIndex() == ListsFragment.TAB_INDEX_SPEED_DIAL) {
