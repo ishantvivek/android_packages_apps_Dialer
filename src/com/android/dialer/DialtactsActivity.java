@@ -760,11 +760,8 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
             });
         } else {
             mFloatingActionButtonController.setVisible(false);
-<<<<<<< HEAD
             onFloatingActionButtonHidden();
-=======
             maybeEnterSearchUi();
->>>>>>> 81a313d... Enter search UI even if dialpad is not animating
         }
         mActionBarController.onDialpadUp();
 
