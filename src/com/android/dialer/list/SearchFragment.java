@@ -269,16 +269,6 @@ public class SearchFragment extends PhoneNumberPickerFragment {
                 listView.getPaddingBottom());
     }
 
-    @Override
-    protected void startLoading() {
-        if (PermissionsUtil.hasContactsPermissions(getActivity())) {
-            super.startLoading();
-        } else if (TextUtils.isEmpty(getQueryString())) {
-            // Clear out any existing call shortcuts.
-            getAdapter().setQueryString(null);
-        }
-    }
-
     public void setOnTouchListener(View.OnTouchListener onTouchListener) {
         mActivityOnTouchListener = onTouchListener;
     }
