@@ -61,15 +61,12 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
     // Oldest recents entry to display is 2 weeks old.
     private static final long OLDEST_RECENTS_DATE = 1000L * 60 * 60 * 24 * 14;
 
-<<<<<<< lollipop5.1
     private static final String KEY_LAST_DISMISSED_CALL_SHORTCUT_DATE =
             "key_last_dismissed_call_shortcut_date";
 
     public static final float REMOVE_VIEW_SHOWN_ALPHA = 0.5f;
     public static final float REMOVE_VIEW_HIDDEN_ALPHA = 1;
 
-=======
->>>>>>> 432d4b5 Some ListsFragment cleanups.
     public interface HostInterface {
         public void showCallHistory();
         public ActionBarController getActionBarController();
@@ -90,7 +87,6 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
 
     private String[] mTabTitles;
 
-<<<<<<< lollipop5.1
     private ShortcutCardsAdapter mMergedAdapter;
     private CallLogAdapter mCallLogAdapter;
     private CallLogQueryHandler mCallLogQueryHandler;
@@ -182,12 +178,6 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
         }
         throw new IllegalStateException("No fragment at position " + position);
     }
-=======
-    /**
-     * The position of the currently selected tab.
-     */
-    private int mTabIndex = TAB_INDEX_SPEED_DIAL;
->>>>>>> 432d4b5 Some ListsFragment cleanups.
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {
         public ViewPagerAdapter(FragmentManager fm) {
@@ -261,11 +251,14 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
     @Override
     public void onResume() {
         super.onResume();
+        final SharedPreferences prefs = getActivity().getSharedPreferences(
+                DialtactsActivity.SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+        mLastCallShortcutDate = prefs.getLong(KEY_LAST_DISMISSED_CALL_SHORTCUT_DATE, 0);
         mActionBar = getActivity().getActionBar();
         fetchCalls();
         mCallLogAdapter.setLoading(true);
         if (getUserVisibleHint()) {
-            sendScreenViewForCurrentPosition();
+            sendScreenViewForPosition(mViewPager.getCurrentItem());
         }
     }
 
@@ -290,11 +283,7 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
         mViewPager = (ViewPager) parentView.findViewById(R.id.lists_pager);
         mViewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
         mViewPager.setAdapter(mViewPagerAdapter);
-<<<<<<< lollipop5.1
         mViewPager.setOffscreenPageLimit(2);
-=======
-        mViewPager.setOffscreenPageLimit(TAB_COUNT_WITH_VOICEMAIL - 1);
->>>>>>> 432d4b5 Some ListsFragment cleanups.
         mViewPager.setOnPageChangeListener(this);
         mViewPager.setCurrentItem(getRtlPosition(TAB_INDEX_SPEED_DIAL));
 
@@ -366,8 +355,6 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        mTabIndex = getRtlPosition(position);
-
         final int count = mOnPageChangeListeners.size();
         for (int i = 0; i < count; i++) {
             mOnPageChangeListeners.get(i).onPageScrolled(position, positionOffset,
@@ -377,16 +364,11 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
 
     @Override
     public void onPageSelected(int position) {
-<<<<<<< lollipop5.1
-=======
-        mTabIndex = getRtlPosition(position);
-
->>>>>>> 432d4b5 Some ListsFragment cleanups.
         final int count = mOnPageChangeListeners.size();
         for (int i = 0; i < count; i++) {
             mOnPageChangeListeners.get(i).onPageSelected(position);
         }
-        sendScreenViewForCurrentPosition();
+        sendScreenViewForPosition(position);
     }
 
     @Override
@@ -397,35 +379,6 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
         }
     }
 
-<<<<<<< lollipop5.1
-=======
-    @Override
-    public void onVoicemailStatusFetched(Cursor statusCursor) {
-        if (getActivity() == null || getActivity().isFinishing()) {
-            return;
-        }
-
-        // Update mHasActiveVoicemailProvider, which controls the number of tabs displayed.
-        boolean hasActiveVoicemailProvider =
-                mVoicemailStatusHelper.getNumberActivityVoicemailSources(statusCursor) > 0;
-        if (hasActiveVoicemailProvider != mHasActiveVoicemailProvider) {
-            mHasActiveVoicemailProvider = hasActiveVoicemailProvider;
-            mViewPagerAdapter.notifyDataSetChanged();
-            mViewPagerTabs.setViewPager(mViewPager);
-        }
-    }
-
-    @Override
-    public boolean onCallsFetched(Cursor statusCursor) {
-        // Return false; did not take ownership of cursor
-        return false;
-    }
-
-    public int getCurrentTabIndex() {
-        return mTabIndex;
-    }
-
->>>>>>> 432d4b5 Some ListsFragment cleanups.
     public void showRemoveView(boolean show) {
         mRemoveViewContent.setVisibility(show ? View.VISIBLE : View.GONE);
         mRemoveView.setAlpha(show ? 0 : 1);
@@ -470,7 +423,7 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
         return mRemoveView;
     }
 
-    private int getRtlPosition(int position) {
+    public int getRtlPosition(int position) {
         if (DialerUtils.isRtl()) {
             return TAB_INDEX_COUNT - 1 - position;
         }
@@ -478,12 +431,15 @@ public class ListsFragment extends Fragment implements CallLogQueryHandler.Liste
     }
 
     public void sendScreenViewForCurrentPosition() {
+        sendScreenViewForPosition(mViewPager.getCurrentItem());
+    }
+
+    private void sendScreenViewForPosition(int position) {
         if (!isResumed()) {
             return;
         }
-
         String fragmentName;
-        switch (getCurrentTabIndex()) {
+        switch (getRtlPosition(position)) {
             case TAB_INDEX_SPEED_DIAL:
                 fragmentName = SpeedDialFragment.class.getSimpleName();
                 break;
