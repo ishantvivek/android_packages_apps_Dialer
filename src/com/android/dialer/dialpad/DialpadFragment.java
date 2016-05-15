@@ -434,7 +434,7 @@ public class DialpadFragment extends Fragment
 
         final View floatingActionButtonContainer =
                 fragmentView.findViewById(R.id.dialpad_floating_action_button_container);
-        final ImageButton floatingActionButton =
+        final View floatingActionButton =
                 (ImageButton) fragmentView.findViewById(R.id.dialpad_floating_action_button);
         floatingActionButton.setOnClickListener(this);
         mFloatingActionButtonController = new FloatingActionButtonController(getActivity(),
@@ -1285,9 +1285,7 @@ public class DialpadFragment extends Fragment
     }
 
     public void clearDialpad() {
-        if (mDigits != null) {
-            mDigits.getText().clear();
-        }
+        mDigits.getText().clear();
     }
 
     private void handleDialButtonClickWithEmptyDigits() {
