@@ -1401,20 +1401,11 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
      *
      * @param animate Whether or not to animate the transition.
      */
-<<<<<<< lollipop5.1
     private int getFabAlignment() {
         if (!mIsLandscape && !isInSearchUi() &&
                 mListsFragment.getCurrentTabIndex() == ListsFragment.TAB_INDEX_SPEED_DIAL) {
             return FloatingActionButtonController.ALIGN_MIDDLE;
         }
         return FloatingActionButtonController.ALIGN_END;
-=======
-    private void updateFloatingActionButtonControllerAlignment(boolean animate) {
-        int align = (!mIsLandscape &&
-                mListsFragment.getTabPosition() == ListsFragment.TAB_INDEX_SPEED_DIAL) ?
-                FloatingActionButtonController.ALIGN_MIDDLE :
-                        FloatingActionButtonController.ALIGN_END;
-        mFloatingActionButtonController.align(align, 0 /* offsetX */, 0 /* offsetY */, animate);
->>>>>>> fdfeaaf Change FAB icon and behavior for contacts tab.
     }
 }
