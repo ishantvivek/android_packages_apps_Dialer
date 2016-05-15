@@ -565,9 +565,7 @@ public class DialtactsActivity extends TransactionSafeActivity implements View.O
             mIsRestarting = false;
         }
         prepareVoiceSearchButton();
-        mDialerDatabaseHelper.startSmartDialUpdateThread();
         mFloatingActionButtonController.align(getFabAlignment(), false /* animate */);
-        Trace.endSection();
     }
 
     @Override
